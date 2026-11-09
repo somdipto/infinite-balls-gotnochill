@@ -1,0 +1,21 @@
+version: 1
+name: zro
+authClass: email-otp
+signupUrl: https://zro.moonmath.ai/get-started
+keysUrl: https://zro.moonmath.ai/api-keys
+apiBaseUrl: https://zro.moonmath.ai/v1
+defaultModel: deepseek-v4.1-flash
+freeModelIds:
+  - deepseek-v4.1-flash
+  - glm-5.3-flash
+quotaProbe:
+  url: https://zro.moonmath.ai/api/cli/status
+  remainingPath: billing.free.remainingPercent
+  resetsAtPath: billing.free.resetsAt
+limits:
+  resetUtcHour: 0
+riskNotes:
+  - User-supplied endpoint/model details; not live-verified by this project.
+  - Obtain an authorized key yourself; this skill does not create disposable accounts.
+  - Keys may be shown only once. Import via stdin; do not include keys in CLI arguments or logs.
+  - Live quota resetsAt takes precedence over the fallback UTC reset hour.

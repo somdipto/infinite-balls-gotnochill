@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "rootDir": ".",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["skill/**/*.ts", "proxy/**/*.ts", "adapters/**/*.ts", "vault/**/*.ts", "rsi/**/*.ts", "mock/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

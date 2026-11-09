@@ -1,0 +1,22 @@
+version: 1
+name: apinex
+authClass: oauth-google
+signupUrl: https://apinex.bond/register
+keysUrl: https://apinex.bond/keys
+apiBaseUrl: https://api.apinex.bond/v1
+defaultModel: free/deepseek-v4.1-flash
+freeModelIds:
+  - free/deepseek-v4.1-flash
+  - free/glm-5.3-flash
+requiredModelPrefix: free/
+keyPrefix: sk-apx
+quotaProbe: null
+limits:
+  requestsPerMinute: 15
+  resetUtcHour: 0
+riskNotes:
+  - User-supplied free-tier limits and model IDs; not live-verified by this project.
+  - Google OAuth requires your existing personal Google session. No Gmail account creation.
+  - No documented quota endpoint was supplied. Model listings are NOT quota measurements.
+  - The proxy enforces free/ IDs and the explicit freeModelIds allowlist before forwarding.
+  - API keys and Google sessions stay separate; only explicitly imported keys enter the vault.

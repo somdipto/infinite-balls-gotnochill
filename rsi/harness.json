@@ -1,0 +1,5 @@
+{
+  "selector": "#credential",
+  "timeoutMs": 1000,
+  "paceMs": 0
+}

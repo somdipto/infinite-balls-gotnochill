@@ -1,0 +1,11 @@
+# Decisions and limits
+
+- **Authorized credentials only.** Disposable identities/account recycling to defeat quotas are excluded. Account signup, OTP mail, Google login, SMS, and CAPTCHA remain provider-supported user actions, not unattended recipes. This deliberately does not claim the original zero-human signup acceptance criteria.
+- **No infinite-free guarantee.** Quota/rate limits are real. Bounded waiting and honest capacity failures replace any promise that every caller request will succeed.
+- **Same-account rotation.** One account per platform per workspace; one active key; replacement imports are idempotent and preserve cooldown state. No account pools or quota resets through key cycling.
+- **No live-provider proof.** Zro/APInex URLs, model IDs, auth classes, key prefix, and stated limits came from the supplied specification. Local fixture success does not verify those live services. APInex model catalogs are not quota probes.
+- **Boring runtime.** TypeScript ESM on Node 22.19+, native HTTP/fetch, YAML/Zod validation, AES-GCM via Node crypto, portable advisory locks, and Playwright Chromium. No native database, paid API, anti-detection proxy, or model dependency is needed for local verification.
+- **Honest harness support.** Env export and Continue merging are implemented. Cline/Roo/Cursor private credential stores are not modified; unsupported paths fail explicitly. Initial env/client selection is manual; later key maintenance is hot through the proxy.
+- **Owned browser state.** Fixtures never use the live Dani Bot server, user data, personal Google profile, or desktop input. Coordinate computer-use is deterministic browser automation, not a trained vision agent. External screenshots are refused.
+- **Harness²-inspired, not copied.** The loop follows fixed-model Propose–Probe–Compose and persistent evidence from https://github.com/google-research/harness2. This is an independent narrow implementation, not upstream's general recursive model-backed benchmark framework. It cannot train/improve model weights.
+- **Explicit external prerequisites.** Chromium must be installed with the project's Playwright version. A custom RSI evaluator is trusted code; review it and supply nonsecret local cases. Unsupported protocols/auth schemes require a real adapter, not arbitrary executable YAML.

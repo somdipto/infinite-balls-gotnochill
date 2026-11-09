@@ -1,0 +1,51 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { ConfigSchema } from '../skill/config.js';
+import { PlatformSchema } from '../skill/platform.js';
+import { importCredential, resumeImport } from '../skill/credentials.js';
+import { Events } from '../skill/events.js';
+import { Vault } from '../vault/store.js';
+
+test('a process killed after key commit resumes without a duplicate key or leaked secret', { timeout: 20000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'freeapi-resume-'));
+  const workspace = join(root, 'workspace');
+  const config = ConfigSchema.parse({ version: 1 });
+  const loaded = { config, path: join(root, 'skill.config.yaml'), workspace, platformsDir: join(root, 'platforms') };
+  const origin = 'http://127.0.0.1:12345';
+  const platform = PlatformSchema.parse({ version: 1, name: 'local', authClass: 'existing-key', signupUrl: origin, keysUrl: origin, apiBaseUrl: `${origin}/v1`, defaultModel: 'free/fixture', freeModelIds: ['free/fixture'], quotaProbe: null, limits: { resetUtcHour: 0 } });
+  const credentialUrl = pathToFileURL(join(process.cwd(), 'skill/credentials.ts')).href;
+  const eventsUrl = pathToFileURL(join(process.cwd(), 'skill/events.ts')).href;
+  const code = `import {importCredential} from ${JSON.stringify(credentialUrl)}; import {Events} from ${JSON.stringify(eventsUrl)}; import {setTimeout as delay} from 'node:timers/promises'; let key=''; for await(const chunk of process.stdin) key+=chunk; await importCredential(${JSON.stringify(loaded)},${JSON.stringify(platform)},'same-owner',key,new Events(${JSON.stringify(join(workspace, 'events'))}), async stage=>{if(stage==='key_saved') await delay(60000)});`;
+  const child = spawn(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', code], { cwd: process.cwd(), env: { ...process.env, FREEAPI_VAULT_KEY: undefined, HOME: root }, stdio: ['pipe', 'pipe', 'pipe'] });
+  const { promise: exited, resolve: resolveExit } = Promise.withResolvers<void>();
+  child.once('exit', () => resolveExit());
+  const { promise: committed, resolve: resolveCommit, reject } = Promise.withResolvers<void>();
+  let output = '';
+  child.stdout.on('data', (chunk: Buffer) => { output += chunk.toString(); if (output.includes('"cause":"key_saved"')) resolveCommit(); });
+  child.once('error', reject);
+  child.once('exit', () => reject(new Error('Fixture exited before commit')));
+  child.stdin.end('sk-fixture-crash-secret-1111');
+  try {
+    await committed;
+    child.kill('SIGKILL');
+    await exited;
+    const before = JSON.parse(await readFile(join(workspace, 'checkpoints/local.json'), 'utf8')) as { stage: string };
+    assert.equal(before.stage, 'key_saved');
+    await resumeImport(loaded, platform, new Events(join(workspace, 'events'), false));
+    const after = JSON.parse(await readFile(join(workspace, 'checkpoints/local.json'), 'utf8')) as { stage: string };
+    assert.equal(after.stage, 'ready');
+    const vault = await Vault.open(join(workspace, 'vault'));
+    assert.equal((await vault.inventory())[0]?.generation, 1);
+    await importCredential(loaded, platform, 'same-owner', 'sk-fixture-crash-secret-1111', new Events(join(workspace, 'events'), false));
+    assert.equal((await vault.inventory())[0]?.generation, 1);
+    const exported = await readFile(join(workspace, 'harness.env'), 'utf8');
+    assert.ok(exported.includes('OPENAI_BASE_URL'));
+    assert.ok(!exported.includes('sk-fixture-crash-secret-1111'));
+    assert.ok(!output.includes('sk-fixture-crash-secret-1111'));
+  } finally { child.kill('SIGKILL'); await exited; await rm(root, { recursive: true, force: true }); }
+});

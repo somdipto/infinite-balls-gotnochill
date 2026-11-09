@@ -1,0 +1,25 @@
+version: 1
+workspace: .freeapi
+thresholdRemainingPercent: 25
+quotaPollMs: 30000
+proxy:
+  host: 127.0.0.1
+  port: 5101
+request:
+  timeoutMs: 120000
+  maxWaitMs: 30000
+  maxBodyBytes: 10485760
+  retryBudget: 2
+  concurrency: 4
+  maxQueuedRequests: 32
+browser:
+  headless: true
+  timeoutMs: 30000
+  paceMs: 40
+  driver: computer-use
+harness:
+  adapter: env
+  path: harness.env
+rsi:
+  historyLimit: 20
+  maxMutations: 5

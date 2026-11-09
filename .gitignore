@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.freeapi/
+artifacts/
+*.tgz
+.env
+.env.*
+*.key
+*.enc
+*.lock.tmp
+.DS_Store

@@ -1,0 +1,34 @@
+{
+  "kind": "curated-observed-local-fixture-evidence",
+  "implementation": "Harness2-inspired fixed-model local adaptation",
+  "providerAccountsUsed": false,
+  "paidModelCalls": 0,
+  "weights": { "successRate": 100, "medianTimeToKeySeconds": 0, "humanInterventions": 10 },
+  "cases": ["fast-one", "fast-two", "slow"],
+  "promoted": {
+    "field": "selector",
+    "before": "#obsolete-credential",
+    "after": "#credential",
+    "baselineSuccessRate": 0,
+    "candidateSuccessRate": 0.6666666666666666,
+    "baselineScore": 0,
+    "candidateScore": 66.66666666666666,
+    "outcome": "promoted"
+  },
+  "rejected": {
+    "field": "timeoutMs",
+    "before": 500,
+    "after": 1000,
+    "baselineScore": 66.66666666666666,
+    "candidateScore": 66.66666666666666,
+    "relativeGain": 0,
+    "outcome": "rejected"
+  },
+  "adoptedHarness": { "selector": "#credential", "timeoutMs": 500, "paceMs": 0 },
+  "notes": [
+    "Fresh baseline/candidate browser executions used identical case IDs.",
+    "The slower case remained unsuccessful; the timeout candidate was not adopted.",
+    "The zero demo time weight makes tie rejection independent of timing jitter; elapsed times were measured in run evidence.",
+    "This proves local browser harness adaptation, not live provider signup or production model performance."
+  ]
+}
